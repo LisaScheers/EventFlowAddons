@@ -92,9 +92,7 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
     {
         // TODO: Optimize this to use bulk operations instead of one by one
         // create container if not exists
-        var response = await _database.CreateContainerIfNotExistsAsync(
-            _readModelDescriptionProvider.GetReadModelDescription<TReadModel>().RootContainerName.Value,
-            "/id");
+    
 
         var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
         _logger.LogInformation(
@@ -133,6 +131,13 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
         var response =
             await container.ReadItemAsync<TReadModel>(id, new PartitionKey(id), cancellationToken: cancellationToken);
         return response.Resource;
+    }
+
+    public async Task InitDatabaseAsync(CancellationToken cancellationToken = default)
+    {
+        await _database.CreateContainerIfNotExistsAsync(
+            _readModelDescriptionProvider.GetReadModelDescription<TReadModel>().RootContainerName.Value,
+            "/id", cancellationToken: cancellationToken);
     }
 
     private async Task UpdateReadModelAsync(ReadModelDescription readModelDescription,
@@ -200,4 +205,6 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
             );
         }
     }
+    
+    
 }

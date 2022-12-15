@@ -7,4 +7,6 @@ public interface ICosmosDbReadModelStore<TReadModel> : IReadModelStore<TReadMode
 {
     public IOrderedQueryable<TReadModel> GetItemLinqQueryable();
     public Task<TReadModel> GetByIdAsync(string id, CancellationToken cancellationToken = default);
+    
+    public Task InitDatabaseAsync(CancellationToken cancellationToken = default);
 }

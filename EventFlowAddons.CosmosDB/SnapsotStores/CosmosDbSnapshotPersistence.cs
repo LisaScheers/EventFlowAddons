@@ -114,7 +114,7 @@ public class CosmosDbSnapshotPersistence : ISnapshotPersistence
                     }
             }
         }
-        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (AggregateException ex) when (ex.InnerExceptions.Any(e => e is CosmosException {StatusCode: HttpStatusCode.NotFound}))
         {
             _logger.LogInformation("No snapshots found for aggregate {Name}", aggregateType.Name);
             // ignore
@@ -137,9 +137,11 @@ public class CosmosDbSnapshotPersistence : ISnapshotPersistence
                         new PartitionKey(item.AggregateName), cancellationToken: cancellationToken);
             }
         }
-        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (AggregateException ex) when (ex.InnerExceptions.Any(e => e is CosmosException {StatusCode: HttpStatusCode.NotFound}))
         {
+            _logger.LogInformation("No snapshots found");
             // ignore
         }
+    
     }
 }

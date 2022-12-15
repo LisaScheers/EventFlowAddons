@@ -7,6 +7,7 @@ using EventFlow.TestHelpers.Aggregates.Entities;
 using EventFlow.TestHelpers.Extensions;
 using EventFlow.TestHelpers.Suites;
 using EventFlowAddons.CosmosDB.Extensions;
+using EventFlowAddons.CosmosDB.ReadStore;
 using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
 using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
 using FluentAssertions;
@@ -49,6 +50,11 @@ public class CosmosDbReadModelStoreTests : TestSuiteForReadModelStore
             );
 
         var serviceProvider = base.Configure(eventFlowOptions);
+
+        var a= serviceProvider.GetService<ICosmosDbReadModelStore<CosmosDbThingyReadModel>>();
+        var b = serviceProvider.GetService<ICosmosDbReadModelStore<CosmosDbThingyMessageReadModel>>();
+        a.InitDatabaseAsync().Wait();
+        b.InitDatabaseAsync().Wait();
 
         return serviceProvider;
     }
