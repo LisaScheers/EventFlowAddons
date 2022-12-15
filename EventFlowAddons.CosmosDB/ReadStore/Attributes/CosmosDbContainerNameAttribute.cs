@@ -1,12 +1,16 @@
-﻿namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes;
+﻿using System;
 
-[AttributeUsage(AttributeTargets.Class)]
-public class CosmosDbContainerNameAttribute : Attribute
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes
 {
-    public CosmosDbContainerNameAttribute(string containerName)
-    {
-        ContainerName = containerName;
-    }
 
-    public string ContainerName { get; }
+    [AttributeUsage(AttributeTargets.Class)]
+    public class CosmosDbContainerNameAttribute : Attribute
+    {
+        public CosmosDbContainerNameAttribute(string containerName)
+        {
+            ContainerName = containerName;
+        }
+
+        public string ContainerName { get; }
+    }
 }

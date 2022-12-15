@@ -1,11 +1,14 @@
+using System;
 using EventFlow.ValueObjects;
 
-namespace LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
-
-public class RootContainerName : SingleValueObject<string>
+namespace LisaScheers.EventFlowAddons.CosmosDB.ValueObjects
 {
-    public RootContainerName(string value) : base(value)
+
+    public class RootContainerName : SingleValueObject<string>
     {
-        if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+        public RootContainerName(string value) : base(value)
+        {
+            if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(value));
+        }
     }
 }

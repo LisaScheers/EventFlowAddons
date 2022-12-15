@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using EventFlow.Aggregates;
 using EventFlow.ReadStores;
 using EventFlow.TestHelpers.Aggregates;
@@ -5,55 +7,57 @@ using EventFlow.TestHelpers.Aggregates.Events;
 using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 using LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes;
 
-namespace EventFlow.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
-
-[CosmosDbContainerName("thingy")]
-public class CosmosDbThingyReadModel : ICosmosDbReadModel,
-    IAmReadModelFor<ThingyAggregate, ThingyId, ThingyDomainErrorAfterFirstEvent>,
-    IAmReadModelFor<ThingyAggregate, ThingyId, ThingyPingEvent>,
-    IAmReadModelFor<ThingyAggregate, ThingyId, ThingyDeletedEvent>
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels
 {
-    public bool DomainErrorAfterFirstReceived { get; set; }
 
-    public int PingsReceived { get; set; }
-
-    public Task ApplyAsync(IReadModelContext context,
-        IDomainEvent<ThingyAggregate, ThingyId, ThingyDeletedEvent> domainEvent,
-        CancellationToken cancellationToken)
+    [CosmosDbContainerName("thingy")]
+    public class CosmosDbThingyReadModel : ICosmosDbReadModel,
+        IAmReadModelFor<ThingyAggregate, ThingyId, ThingyDomainErrorAfterFirstEvent>,
+        IAmReadModelFor<ThingyAggregate, ThingyId, ThingyPingEvent>,
+        IAmReadModelFor<ThingyAggregate, ThingyId, ThingyDeletedEvent>
     {
-        context.MarkForDeletion();
+        public bool DomainErrorAfterFirstReceived { get; set; }
 
-        return Task.CompletedTask;
-    }
+        public int PingsReceived { get; set; }
 
-    public Task ApplyAsync(IReadModelContext context,
-        IDomainEvent<ThingyAggregate, ThingyId, ThingyDomainErrorAfterFirstEvent> domainEvent,
-        CancellationToken cancellationToken)
-    {
-        Id = domainEvent.AggregateIdentity.Value;
-        DomainErrorAfterFirstReceived = true;
+        public Task ApplyAsync(IReadModelContext context,
+            IDomainEvent<ThingyAggregate, ThingyId, ThingyDeletedEvent> domainEvent,
+            CancellationToken cancellationToken)
+        {
+            context.MarkForDeletion();
 
-        return Task.CompletedTask;
-    }
+            return Task.CompletedTask;
+        }
 
-    public Task ApplyAsync(IReadModelContext context,
-        IDomainEvent<ThingyAggregate, ThingyId, ThingyPingEvent> domainEvent,
-        CancellationToken cancellationToken)
-    {
-        Id = domainEvent.AggregateIdentity.Value;
-        PingsReceived++;
+        public Task ApplyAsync(IReadModelContext context,
+            IDomainEvent<ThingyAggregate, ThingyId, ThingyDomainErrorAfterFirstEvent> domainEvent,
+            CancellationToken cancellationToken)
+        {
+            Id = domainEvent.AggregateIdentity.Value;
+            DomainErrorAfterFirstReceived = true;
 
-        return Task.CompletedTask;
-    }
+            return Task.CompletedTask;
+        }
 
-    public string Id { get; set; }
-    public long? Version { get; set; }
+        public Task ApplyAsync(IReadModelContext context,
+            IDomainEvent<ThingyAggregate, ThingyId, ThingyPingEvent> domainEvent,
+            CancellationToken cancellationToken)
+        {
+            Id = domainEvent.AggregateIdentity.Value;
+            PingsReceived++;
 
-    public Thingy ToThingy()
-    {
-        return new Thingy(
-            ThingyId.With(Id),
-            PingsReceived,
-            DomainErrorAfterFirstReceived);
+            return Task.CompletedTask;
+        }
+
+        public string Id { get; set; }
+        public long? Version { get; set; }
+
+        public Thingy ToThingy()
+        {
+            return new Thingy(
+                ThingyId.With(Id),
+                PingsReceived,
+                DomainErrorAfterFirstReceived);
+        }
     }
 }

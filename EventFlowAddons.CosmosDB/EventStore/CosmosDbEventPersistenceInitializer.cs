@@ -1,37 +1,41 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
 
-namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore;
-
-public class CosmosDbEventPersistenceInitializer : ICosmosDbEventPersistenceInitializer
+namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore
 {
-    private readonly Database _database;
 
-    public CosmosDbEventPersistenceInitializer(Database database)
+    public class CosmosDbEventPersistenceInitializer : ICosmosDbEventPersistenceInitializer
     {
-        _database = database;
-    }
+        private readonly Database _database;
 
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        // create event counter container 
-        var eventContainer = await _database.CreateContainerIfNotExistsAsync(
-            new ContainerProperties("counter", "/id"),
-            cancellationToken: cancellationToken);
-        // create event store container
-        var eventStoreContainer = await _database.CreateContainerIfNotExistsAsync(
-            new ContainerProperties("events", "/AggregateId")
-            {
-                UniqueKeyPolicy = new UniqueKeyPolicy
+        public CosmosDbEventPersistenceInitializer(Database database)
+        {
+            _database = database;
+        }
+
+        public async Task InitializeAsync(CancellationToken cancellationToken = default)
+        {
+            // create event counter container 
+            var eventContainer = await _database.CreateContainerIfNotExistsAsync(
+                new ContainerProperties("counter", "/id"),
+                cancellationToken: cancellationToken);
+            // create event store container
+            var eventStoreContainer = await _database.CreateContainerIfNotExistsAsync(
+                new ContainerProperties("events", "/AggregateId")
                 {
-                    UniqueKeys =
+                    UniqueKeyPolicy = new UniqueKeyPolicy
                     {
-                        new UniqueKey
+                        UniqueKeys =
                         {
-                            Paths = {"/AggregateId", "/AggregateSequenceNumber"}
+                            new UniqueKey
+                            {
+                                Paths = {"/AggregateId", "/AggregateSequenceNumber"}
+                            }
                         }
                     }
-                }
-            },
-            cancellationToken: cancellationToken);
+                },
+                cancellationToken: cancellationToken);
+        }
     }
 }

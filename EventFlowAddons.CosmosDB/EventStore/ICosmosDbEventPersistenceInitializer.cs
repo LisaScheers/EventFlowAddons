@@ -1,6 +1,11 @@
-﻿namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
-public interface ICosmosDbEventPersistenceInitializer
+namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore
 {
-    Task InitializeAsync(CancellationToken cancellationToken = default);
+
+    public interface ICosmosDbEventPersistenceInitializer
+    {
+        Task InitializeAsync(CancellationToken cancellationToken = default);
+    }
 }
