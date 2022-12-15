@@ -4,6 +4,14 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>EventFlowAddons.CosmosDB</Title>
+        <Authors>Lisa Scheers</Authors>
+        <Copyright>Lisa Scheers</Copyright>
+        <PackageProjectUrl>https://github.com/LisaScheers/EventFlowAddons</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/LisaScheers/EventFlowAddons/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/LisaScheers/EventFlowAddons</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
