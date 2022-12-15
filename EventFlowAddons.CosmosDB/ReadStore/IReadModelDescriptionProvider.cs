@@ -6,6 +6,5 @@ public interface IReadModelDescriptionProvider
 {
     ReadModelDescription GetReadModelDescription<TReadModel>()
         where TReadModel : ICosmosDbReadModel;
-    
 }
 

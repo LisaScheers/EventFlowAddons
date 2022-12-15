@@ -2,7 +2,7 @@
 
 namespace EventFlowAddons.CosmosDB.ValueObjects;
 
-public class ReadModelDescription: ValueObject
+public class ReadModelDescription : ValueObject
 {
     public ReadModelDescription(RootContainerName rootContainerName)
     {

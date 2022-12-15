@@ -6,10 +6,10 @@ using EventFlowAddons.CosmosDB.ValueObjects;
 
 namespace EventFlowAddons.CosmosDB.ReadStore;
 
-public class ReadModelDescriptionProvider: IReadModelDescriptionProvider
+public class ReadModelDescriptionProvider : IReadModelDescriptionProvider
 {
-    private static readonly ConcurrentDictionary<Type, ReadModelDescription> CollectionNames
-        = new ConcurrentDictionary<Type, ReadModelDescription>();
+    private static readonly ConcurrentDictionary<Type, ReadModelDescription> CollectionNames = new();
+
     public ReadModelDescription GetReadModelDescription<TReadModel>() where TReadModel : ICosmosDbReadModel
     {
         return CollectionNames.GetOrAdd(

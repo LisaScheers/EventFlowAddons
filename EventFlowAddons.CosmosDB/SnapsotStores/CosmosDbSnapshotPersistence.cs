@@ -9,21 +9,24 @@ using Microsoft.Extensions.Logging;
 
 namespace EventFlowAddons.CosmosDB.SnapsotStores;
 
-public class CosmosDbSnapshotPersistence: ISnapshotPersistence
+public class CosmosDbSnapshotPersistence : ISnapshotPersistence
 {
     private const string SnapShotsContainerName = "snapShots";
-    private readonly ILogger<CosmosDbSnapshotPersistence> _logger;
     private readonly Database _database;
-    
+    private readonly ILogger<CosmosDbSnapshotPersistence> _logger;
+
     public CosmosDbSnapshotPersistence(ILogger<CosmosDbSnapshotPersistence> logger, Database database)
     {
         _logger = logger;
         _database = database;
     }
-    public async Task<CommittedSnapshot?> GetSnapshotAsync(Type aggregateType, IIdentity identity, CancellationToken cancellationToken)
+
+    public async Task<CommittedSnapshot?> GetSnapshotAsync(Type aggregateType, IIdentity identity,
+        CancellationToken cancellationToken)
     {
         var container = _database.GetContainer(SnapShotsContainerName);
-        _logger.LogInformation("Getting snapshot for aggregate {Name} with id {Value}", aggregateType.Name, identity.Value);
+        _logger.LogInformation("Getting snapshot for aggregate {Name} with id {Value}", aggregateType.Name,
+            identity.Value);
         try
         {
             var query = container.GetItemLinqQueryable<CosmosDbSnapshotDataModel>(true)
@@ -34,14 +37,15 @@ public class CosmosDbSnapshotPersistence: ISnapshotPersistence
             var result = await query.ReadNextAsync(cancellationToken);
             var snapshot = result.FirstOrDefault();
             if (snapshot != null) return new CommittedSnapshot(snapshot.Metadata, snapshot.Data);
-            _logger.LogInformation("No snapshot found for aggregate {Name} with id {Value}", aggregateType.Name, identity.Value);
+            _logger.LogInformation("No snapshot found for aggregate {Name} with id {Value}", aggregateType.Name,
+                identity.Value);
             return null;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             return null;
         }
-        catch(CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             return null;
         }
@@ -50,14 +54,14 @@ public class CosmosDbSnapshotPersistence: ISnapshotPersistence
     public async Task SetSnapshotAsync(Type aggregateType, IIdentity identity, SerializedSnapshot serializedSnapshot,
         CancellationToken cancellationToken)
     {
-        
-        await _database.CreateContainerIfNotExistsAsync(SnapShotsContainerName, "/aggregateId", cancellationToken: cancellationToken);
-        
+        await _database.CreateContainerIfNotExistsAsync(SnapShotsContainerName, "/aggregateId",
+            cancellationToken: cancellationToken);
+
         var container = _database.GetContainer(SnapShotsContainerName);
-        
-        
-        
-        _logger.LogInformation("Setting snapshot for aggregate {Name} with id {Value}", aggregateType.Name, identity.Value);
+
+
+        _logger.LogInformation("Setting snapshot for aggregate {Name} with id {Value}", aggregateType.Name,
+            identity.Value);
         var snapshot = new CosmosDbSnapshotDataModel
         {
             AggregateId = identity.Value,
@@ -67,64 +71,75 @@ public class CosmosDbSnapshotPersistence: ISnapshotPersistence
             Id = Guid.NewGuid().ToString(),
             AggregateName = aggregateType.Name
         };
-         await container.CreateItemAsync(snapshot, cancellationToken: cancellationToken);
+        await container.CreateItemAsync(snapshot, cancellationToken: cancellationToken);
     }
 
     public async Task DeleteSnapshotAsync(Type aggregateType, IIdentity identity, CancellationToken cancellationToken)
     {
         var container = _database.GetContainer(SnapShotsContainerName);
-        _logger.LogInformation("Deleting snapshot for aggregate {Name} with id {Value}", aggregateType.Name, identity.Value);
+        _logger.LogInformation("Deleting snapshot for aggregate {Name} with id {Value}", aggregateType.Name,
+            identity.Value);
         try
         {
-            await container.DeleteItemAsync<CosmosDbSnapshotDataModel>(identity.Value, new PartitionKey(aggregateType.Name), cancellationToken: cancellationToken);
+            await container.DeleteItemAsync<CosmosDbSnapshotDataModel>(identity.Value,
+                new PartitionKey(aggregateType.Name), cancellationToken: cancellationToken);
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             // ignore
         }
-       
     }
 
     public async Task PurgeSnapshotsAsync(Type aggregateType, CancellationToken cancellationToken)
     {
-        var container = _database.GetContainer(SnapShotsContainerName);
-        _logger.LogInformation("Purging snapshots for aggregate {Name}", aggregateType.Name);
-        var query = container.GetItemLinqQueryable<CosmosDbSnapshotDataModel>(true)
-            .Where(x => x.AggregateName == aggregateType.Name)
-            .ToFeedIterator();
-        while (query.HasMoreResults)
+        try
         {
-            var result = query.ReadNextAsync(cancellationToken).Result;
-            foreach (var item in result)
+            var container = _database.GetContainer(SnapShotsContainerName);
+            _logger.LogInformation("Purging snapshots for aggregate {Name}", aggregateType.Name);
+            var query = container.GetItemLinqQueryable<CosmosDbSnapshotDataModel>(true)
+                .Where(x => x.AggregateName == aggregateType.Name)
+                .ToFeedIterator();
+            while (query.HasMoreResults)
             {
-                try
-                {
-                    await container.DeleteItemAsync<CosmosDbSnapshotDataModel>(item.Id, new PartitionKey(item.AggregateName), cancellationToken: cancellationToken);
-
-                }
-                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-                {
-                    // ignore
-                }
+                var result = query.ReadNextAsync(cancellationToken).Result;
+                foreach (var item in result)
+                    try
+                    {
+                        await container.DeleteItemAsync<CosmosDbSnapshotDataModel>(item.Id,
+                            new PartitionKey(item.AggregateName), cancellationToken: cancellationToken);
+                    }
+                    catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        // ignore
+                    }
             }
         }
-        
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            _logger.LogInformation("No snapshots found for aggregate {Name}", aggregateType.Name);
+            // ignore
+        }
     }
 
-    public Task PurgeSnapshotsAsync(CancellationToken cancellationToken)
+    public async Task PurgeSnapshotsAsync(CancellationToken cancellationToken)
     {
-        var container = _database.GetContainer(SnapShotsContainerName);
-        _logger.LogInformation("Purging all snapshots");
-        var query = container.GetItemLinqQueryable<CosmosDbSnapshotDataModel>(true)
-            .ToFeedIterator();
-        while (query.HasMoreResults)
+        try
         {
-            var result = query.ReadNextAsync(cancellationToken).Result;
-            foreach (var item in result)
+            var container = _database.GetContainer(SnapShotsContainerName);
+            _logger.LogInformation("Purging all snapshots");
+            var query = container.GetItemLinqQueryable<CosmosDbSnapshotDataModel>(true)
+                .ToFeedIterator();
+            while (query.HasMoreResults)
             {
-                container.DeleteItemAsync<CosmosDbSnapshotDataModel>(item.Id, new PartitionKey(item.AggregateName), cancellationToken: cancellationToken);
+                var result = query.ReadNextAsync(cancellationToken).Result;
+                foreach (var item in result)
+                    await container.DeleteItemAsync<CosmosDbSnapshotDataModel>(item.Id,
+                        new PartitionKey(item.AggregateName), cancellationToken: cancellationToken);
             }
         }
-        return Task.CompletedTask;
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            // ignore
+        }
     }
 }

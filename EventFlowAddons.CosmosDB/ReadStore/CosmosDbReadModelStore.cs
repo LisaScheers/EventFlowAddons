@@ -14,8 +14,8 @@ namespace EventFlowAddons.CosmosDB.ReadStore;
 public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadModel>
     where TReadModel : class, ICosmosDbReadModel
 {
-    private readonly ILogger<CosmosDbReadModelStore<TReadModel>> _logger;
     private readonly Database _database;
+    private readonly ILogger<CosmosDbReadModelStore<TReadModel>> _logger;
     private readonly IReadModelDescriptionProvider _readModelDescriptionProvider;
     private readonly ITransientFaultHandler<IOptimisticConcurrencyRetryStrategy> _transientFaultHandler;
 
@@ -41,7 +41,6 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
             readModelDescription.RootContainerName);
         var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
         await container.DeleteItemAsync<TReadModel>(id, new PartitionKey(id), cancellationToken: cancellationToken);
-
     }
 
     public async Task DeleteAllAsync(CancellationToken cancellationToken)
@@ -58,10 +57,8 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
         {
             var response = await query.ReadNextAsync(cancellationToken);
             foreach (var item in response)
-            {
                 await container.DeleteItemAsync<TReadModel>(item.Id, new PartitionKey(item.Id),
                     cancellationToken: cancellationToken);
-            }
         }
     }
 
@@ -77,14 +74,65 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
         var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
         try
         {
-            var response = await container.ReadItemAsync<TReadModel>(id, new PartitionKey(id), cancellationToken: cancellationToken);
+            var response =
+                await container.ReadItemAsync<TReadModel>(id, new PartitionKey(id),
+                    cancellationToken: cancellationToken);
             return ReadModelEnvelope<TReadModel>.With(id, response.Resource, response.Resource.Version);
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             return ReadModelEnvelope<TReadModel>.Empty(id);
         }
-       
+    }
+
+    public async Task UpdateAsync(IReadOnlyCollection<ReadModelUpdate> readModelUpdates,
+        IReadModelContextFactory readModelContextFactory,
+        Func<IReadModelContext, IReadOnlyCollection<IDomainEvent>, ReadModelEnvelope<TReadModel>, CancellationToken,
+            Task<ReadModelUpdateResult<TReadModel>>> updateReadModel, CancellationToken cancellationToken)
+    {
+        // TODO: Optimize this to use bulk operations instead of one by one
+        // create container if not exists
+        var response = await _database.CreateContainerIfNotExistsAsync(
+            _readModelDescriptionProvider.GetReadModelDescription<TReadModel>().RootContainerName.Value,
+            "/id");
+
+        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
+        _logger.LogInformation(
+            "Updating '{ReadModelType}' with id '{Id}', from '{@RootCollectionName}'!",
+            typeof(TReadModel).PrettyPrint(),
+            readModelUpdates.Select(x => x.ReadModelId).Aggregate((x, y) => $"{x}, {y}"),
+            readModelDescription.RootContainerName);
+        foreach (var readModelUpdate in readModelUpdates)
+            await _transientFaultHandler.TryAsync(
+                c => UpdateReadModelAsync(readModelDescription, readModelUpdate, readModelContextFactory,
+                    updateReadModel, c),
+                Label.Named("cosmosdb-readmodel-update")
+                , cancellationToken
+            ).ConfigureAwait(false);
+    }
+
+    public IOrderedQueryable<TReadModel> GetItemLinqQueryable()
+    {
+        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
+
+        var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
+
+        return container.GetItemLinqQueryable<TReadModel>(true);
+    }
+
+    public async Task<TReadModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
+        _logger.LogInformation(
+            "Getting '{ReadModelType}' with id '{Id}', from '{@RootCollectionName}'!",
+            typeof(TReadModel).PrettyPrint(),
+            id,
+            readModelDescription.RootContainerName);
+
+        var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
+        var response =
+            await container.ReadItemAsync<TReadModel>(id, new PartitionKey(id), cancellationToken: cancellationToken);
+        return response.Resource;
     }
 
     private async Task UpdateReadModelAsync(ReadModelDescription readModelDescription,
@@ -105,15 +153,11 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
         catch (Exception e)
         {
             if (e is CosmosException cosmosException && cosmosException.StatusCode == HttpStatusCode.NotFound)
-            {
                 response = null;
-            }
             else
-            {
                 throw;
-            }
         }
-        
+
         var isAvailable = response != null;
         var readModelEnvelope = isAvailable
             ? ReadModelEnvelope<TReadModel>.With(readModelUpdate.ReadModelId, response.Resource)
@@ -123,18 +167,13 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
             await updateReadModel(readModelContext, readModelUpdate.DomainEvents, readModelEnvelope, cancellationToken)
                 .ConfigureAwait(false);
 
-        if (!readModelUpdateResult.IsModified)
-        {
-            return;
-        }
+        if (!readModelUpdateResult.IsModified) return;
 
         if (readModelContext.IsMarkedForDeletion)
         {
             if (isAvailable)
-            {
                 await container.DeleteItemAsync<TReadModel>(readModelUpdate.ReadModelId,
                     new PartitionKey(readModelUpdate.ReadModelId), cancellationToken: cancellationToken);
-            }
             return;
         }
 
@@ -144,18 +183,15 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
         try
         {
             if (isAvailable)
-            {
                 await container.ReplaceItemAsync(readModelEnvelope.ReadModel, readModelUpdate.ReadModelId,
-                    new PartitionKey(readModelUpdate.ReadModelId), new ItemRequestOptions()
+                    new PartitionKey(readModelUpdate.ReadModelId), new ItemRequestOptions
                     {
                         IfMatchEtag = response.ETag
-                    }, cancellationToken: cancellationToken);
-            }
+                    }, cancellationToken);
             else
-            {
-                await container.CreateItemAsync(readModelEnvelope.ReadModel, new PartitionKey(readModelUpdate.ReadModelId),
+                await container.CreateItemAsync(readModelEnvelope.ReadModel,
+                    new PartitionKey(readModelUpdate.ReadModelId),
                     cancellationToken: cancellationToken);
-            }
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.PreconditionFailed)
         {
@@ -163,59 +199,5 @@ public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadM
                 $"Read model with ID '{readModelUpdate.ReadModelId}' was updated by another process", ex
             );
         }
-    }
-
-    public async Task UpdateAsync(IReadOnlyCollection<ReadModelUpdate> readModelUpdates,
-        IReadModelContextFactory readModelContextFactory,
-        Func<IReadModelContext, IReadOnlyCollection<IDomainEvent>, ReadModelEnvelope<TReadModel>, CancellationToken,
-            Task<ReadModelUpdateResult<TReadModel>>> updateReadModel, CancellationToken cancellationToken)
-    {
-        // TODO: Optimize this to use bulk operations instead of one by one
-        // create container if not exists
-        var response = await _database.CreateContainerIfNotExistsAsync(
-            _readModelDescriptionProvider.GetReadModelDescription<TReadModel>().RootContainerName.Value,
-            "/id");
-        
-        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
-        _logger.LogInformation(
-            "Updating '{ReadModelType}' with id '{Id}', from '{@RootCollectionName}'!",
-            typeof(TReadModel).PrettyPrint(),
-            readModelUpdates.Select(x => x.ReadModelId).Aggregate((x, y) => $"{x}, {y}"),
-            readModelDescription.RootContainerName);
-        foreach (var readModelUpdate in readModelUpdates)
-        {
-            await _transientFaultHandler.TryAsync(
-                c => UpdateReadModelAsync(readModelDescription, readModelUpdate, readModelContextFactory,
-                    updateReadModel, c),
-                Label.Named("cosmosdb-readmodel-update")
-                , cancellationToken
-            ).ConfigureAwait(false);
-        }
-
-
-    }
-
-    public IOrderedQueryable<TReadModel> GetItemLinqQueryable()
-    {
-        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
-
-        var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
-
-        return container.GetItemLinqQueryable<TReadModel>(true);
-    }
-    
-    public async Task<TReadModel> GetByIdAsync(string id, CancellationToken cancellationToken = default)
-    {
-        var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
-        _logger.LogInformation(
-            "Getting '{ReadModelType}' with id '{Id}', from '{@RootCollectionName}'!",
-            typeof(TReadModel).PrettyPrint(),
-            id,
-            readModelDescription.RootContainerName);
-
-        var container = _database.GetContainer(readModelDescription.RootContainerName.Value);
-        var response =
-            await container.ReadItemAsync<TReadModel>(id, new PartitionKey(id), cancellationToken: cancellationToken);
-        return response.Resource;
     }
 }

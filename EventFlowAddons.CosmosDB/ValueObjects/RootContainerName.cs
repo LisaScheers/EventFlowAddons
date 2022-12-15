@@ -2,7 +2,7 @@ using EventFlow.ValueObjects;
 
 namespace EventFlowAddons.CosmosDB.ValueObjects;
 
-public class RootContainerName: SingleValueObject<string>
+public class RootContainerName : SingleValueObject<string>
 {
     public RootContainerName(string value) : base(value)
     {
