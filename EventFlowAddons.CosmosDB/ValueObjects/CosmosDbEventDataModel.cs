@@ -1,7 +1,7 @@
 ﻿using EventFlow.EventStores;
 using EventFlow.ValueObjects;
 
-namespace EventFlowAddons.CosmosDB.ValueObjects;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 
 public class CosmosDbEventDataModel : ValueObject, ICommittedDomainEvent
 {

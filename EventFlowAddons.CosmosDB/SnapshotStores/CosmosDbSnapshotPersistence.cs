@@ -2,12 +2,12 @@
 using EventFlow.Core;
 using EventFlow.Snapshots;
 using EventFlow.Snapshots.Stores;
-using EventFlowAddons.CosmosDB.ValueObjects;
+using LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;
 
-namespace EventFlowAddons.CosmosDB.SnapsotStores;
+namespace LisaScheers.EventFlowAddons.CosmosDB.SnapshotStores;
 
 public class CosmosDbSnapshotPersistence : ISnapshotPersistence
 {

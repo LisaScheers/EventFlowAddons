@@ -1,12 +1,12 @@
 using EventFlow;
 using EventFlow.TestHelpers;
 using EventFlow.TestHelpers.Suites;
-using EventFlowAddons.CosmosDB.EventStore;
-using EventFlowAddons.CosmosDB.Extensions;
+using LisaScheers.EventFlowAddons.CosmosDB.EventStore;
+using LisaScheers.EventFlowAddons.CosmosDB.Extensions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EventFlowAddons.CosmosDB.Tests.IntegrationTests.EventStores;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.EventStores;
 
 [Category(Categories.Integration)]
 [TestFixture]

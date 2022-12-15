@@ -1,13 +1,13 @@
 ﻿using EventFlow;
 using EventFlow.Extensions;
 using EventFlow.ReadStores;
-using EventFlowAddons.CosmosDB.EventStore;
-using EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.EventStore;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace EventFlowAddons.CosmosDB.Extensions;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Extensions;
 
 public static class CosmosDbOptionsExtensions
 {

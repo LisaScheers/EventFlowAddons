@@ -1,9 +1,10 @@
+using EventFlow;
 using EventFlow.TestHelpers;
 using EventFlow.TestHelpers.Suites;
-using EventFlowAddons.CosmosDB.Extensions;
+using LisaScheers.EventFlowAddons.CosmosDB.Extensions;
 using Microsoft.Azure.Cosmos;
 
-namespace EventFlow.CosmosDB.Tests.IntegrationTests.SnapshotStores;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.SnapshotStores;
 
 [Category(Categories.Integration)]
 public class CosmosDBSnapshotStoreTests : TestSuiteForSnapshotStore

@@ -3,8 +3,8 @@ using EventFlow.ReadStores;
 using EventFlow.TestHelpers.Aggregates;
 using EventFlow.TestHelpers.Aggregates.Entities;
 using EventFlow.TestHelpers.Aggregates.Events;
-using EventFlowAddons.CosmosDB.ReadStore;
-using EventFlowAddons.CosmosDB.ReadStore.Attributes;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes;
 
 namespace EventFlow.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
 

@@ -2,11 +2,11 @@
 using EventFlow.Core;
 using EventFlow.EventStores;
 using EventFlow.Exceptions;
-using EventFlowAddons.CosmosDB.ValueObjects;
+using LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 
-namespace EventFlowAddons.CosmosDB.EventStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore;
 
 public class CosmosDbEventPersistence : IEventPersistence
 {

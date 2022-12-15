@@ -2,9 +2,9 @@ using EventFlow.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
 using EventFlow.Queries;
 using EventFlow.TestHelpers.Aggregates.Entities;
 using EventFlow.TestHelpers.Aggregates.Queries;
-using EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
-namespace EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
 
 public class
     CosmosDbThingyGetMessagesQueryHandler : IQueryHandler<ThingyGetMessagesQuery, IReadOnlyCollection<ThingyMessage>>

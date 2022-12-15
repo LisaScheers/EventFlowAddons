@@ -5,11 +5,11 @@ using EventFlow.Core.RetryStrategies;
 using EventFlow.Exceptions;
 using EventFlow.Extensions;
 using EventFlow.ReadStores;
-using EventFlowAddons.CosmosDB.ValueObjects;
+using LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 
-namespace EventFlowAddons.CosmosDB.ReadStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
 public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadModel>
     where TReadModel : class, ICosmosDbReadModel

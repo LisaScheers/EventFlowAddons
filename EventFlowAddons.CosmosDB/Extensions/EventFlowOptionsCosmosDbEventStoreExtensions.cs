@@ -1,9 +1,9 @@
 ﻿using EventFlow;
 using EventFlow.Extensions;
-using EventFlowAddons.CosmosDB.EventStore;
+using LisaScheers.EventFlowAddons.CosmosDB.EventStore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace EventFlowAddons.CosmosDB.Extensions;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Extensions;
 
 public static class EventFlowOptionsCosmosDbEventStoreExtensions
 {

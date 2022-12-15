@@ -1,7 +1,7 @@
 ﻿using EventFlow.ReadStores;
 using Newtonsoft.Json;
 
-namespace EventFlowAddons.CosmosDB.ReadStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
 public interface ICosmosDbReadModel : IReadModel
 {

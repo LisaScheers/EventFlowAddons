@@ -6,15 +6,15 @@ using EventFlow.TestHelpers.Aggregates;
 using EventFlow.TestHelpers.Aggregates.Entities;
 using EventFlow.TestHelpers.Extensions;
 using EventFlow.TestHelpers.Suites;
-using EventFlowAddons.CosmosDB.Extensions;
-using EventFlowAddons.CosmosDB.ReadStore;
-using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
-using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
+using LisaScheers.EventFlowAddons.CosmosDB.Extensions;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
+using LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores;
 
 [Category(Categories.Integration)]
 [TestFixture]

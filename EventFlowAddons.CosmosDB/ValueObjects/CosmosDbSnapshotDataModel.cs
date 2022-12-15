@@ -1,7 +1,7 @@
 ﻿using EventFlow.ValueObjects;
 using Newtonsoft.Json;
 
-namespace EventFlowAddons.CosmosDB.ValueObjects;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 
 public class CosmosDbSnapshotDataModel : ValueObject
 {

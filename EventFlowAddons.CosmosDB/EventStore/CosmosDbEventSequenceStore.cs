@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 
-namespace EventFlowAddons.CosmosDB.EventStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore;
 
 public class CosmosDbEventSequenceStore : ICosmosDbEventSequenceStore
 {

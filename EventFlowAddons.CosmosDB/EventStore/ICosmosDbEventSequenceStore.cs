@@ -1,4 +1,4 @@
-﻿namespace EventFlowAddons.CosmosDB.EventStore;
+﻿namespace LisaScheers.EventFlowAddons.CosmosDB.EventStore;
 
 public interface ICosmosDbEventSequenceStore
 {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using EventFlow.Extensions;
-using EventFlowAddons.CosmosDB.ReadStore.Attributes;
-using EventFlowAddons.CosmosDB.ValueObjects;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes;
+using LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 
-namespace EventFlowAddons.CosmosDB.ReadStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
 public class ReadModelDescriptionProvider : IReadModelDescriptionProvider
 {

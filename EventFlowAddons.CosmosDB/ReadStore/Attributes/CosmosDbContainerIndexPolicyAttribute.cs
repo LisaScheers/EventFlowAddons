@@ -1,6 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 
-namespace EventFlowAddons.CosmosDB.ReadStore.Attributes;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class CosmosDbContainerIndexPolicyAttribute : Attribute

@@ -1,6 +1,6 @@
 ﻿using EventFlow.ReadStores;
 
-namespace EventFlowAddons.CosmosDB.ReadStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
 public interface ICosmosDbReadModelStore<TReadModel> : IReadModelStore<TReadModel> where TReadModel : class, IReadModel
 

@@ -1,6 +1,6 @@
-﻿using EventFlowAddons.CosmosDB.ValueObjects;
+﻿using LisaScheers.EventFlowAddons.CosmosDB.ValueObjects;
 
-namespace EventFlowAddons.CosmosDB.ReadStore;
+namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
 
 public interface IReadModelDescriptionProvider
 {

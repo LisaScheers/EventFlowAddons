@@ -5,13 +5,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Title>EventFlowAddons.CosmosDB</Title>
+        <Title>LisaScheers.EventFlowAddons.CosmosDB</Title>
         <Authors>Lisa Scheers</Authors>
         <Copyright>Lisa Scheers</Copyright>
         <PackageProjectUrl>https://github.com/LisaScheers/EventFlowAddons</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/LisaScheers/EventFlowAddons/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/LisaScheers/EventFlowAddons</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <AssemblyName>LisaScheers.EventFlowAddons.CosmosDB</AssemblyName>
+        <RootNamespace>LisaScheers.EventFlowAddons.CosmosDB</RootNamespace>
+        <PackageId>LisaScheers.EventFlowAddons.CosmosDB</PackageId>
+        <Product>LisaScheers.EventFlowAddons.CosmosDB</Product>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,9 +1,9 @@
 using EventFlow.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
 using EventFlow.Queries;
-using EventFlowAddons.CosmosDB.ReadStore;
-using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
 
-namespace EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
 
 public class
     CosmosDbThingyGetWithLinqQueryHandler : IQueryHandler<CosmosDbThingyGetWithLinqQuery,
