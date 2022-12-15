@@ -1,33 +1,38 @@
+using System;
+using EventFlow;
 using EventFlow.TestHelpers;
 using EventFlow.TestHelpers.Suites;
-using EventFlowAddons.CosmosDB.Extensions;
+using LisaScheers.EventFlowAddons.CosmosDB.Extensions;
 using Microsoft.Azure.Cosmos;
+using NUnit.Framework;
 
-namespace EventFlow.CosmosDB.Tests.IntegrationTests.SnapshotStores;
-
-[Category(Categories.Integration)]
-public class CosmosDBSnapshotStoreTests : TestSuiteForSnapshotStore
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.SnapshotStores
 {
-    private CosmosClient _cosmosClient;
 
-    protected override IServiceProvider Configure(IEventFlowOptions eventFlowOptions)
+    [Category(Categories.Integration)]
+    public class CosmosDBSnapshotStoreTests : TestSuiteForSnapshotStore
     {
-        _cosmosClient = new CosmosClient("https://localhost:8081",
-            "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
+        private CosmosClient _cosmosClient;
 
-        _cosmosClient.CreateDatabaseIfNotExistsAsync("EventFlowTest").Wait();
-        eventFlowOptions
-            .ConfigureCosmosDb(() => _cosmosClient.GetDatabase("EventFlowTest"))
-            .UseCosmosDbSnapshotStore();
+        protected override IServiceProvider Configure(IEventFlowOptions eventFlowOptions)
+        {
+            _cosmosClient = new CosmosClient("https://localhost:8081",
+                "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
 
-        var serviceProvider = base.Configure(eventFlowOptions);
+            _cosmosClient.CreateDatabaseIfNotExistsAsync("EventFlowTest").Wait();
+            eventFlowOptions
+                .ConfigureCosmosDb(() => _cosmosClient.GetDatabase("EventFlowTest"))
+                .UseCosmosDbSnapshotStore();
 
-        return serviceProvider;
-    }
+            var serviceProvider = base.Configure(eventFlowOptions);
 
-    [TearDown]
-    public void TearDown()
-    {
-        _cosmosClient.GetDatabase("EventFlowTest").DeleteAsync().Wait();
+            return serviceProvider;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _cosmosClient.GetDatabase("EventFlowTest").DeleteAsync().Wait();
+        }
     }
 }

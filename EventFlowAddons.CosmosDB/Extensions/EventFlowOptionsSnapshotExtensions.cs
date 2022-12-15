@@ -1,16 +1,18 @@
 ﻿using EventFlow;
 using EventFlow.Extensions;
-using EventFlowAddons.CosmosDB.SnapsotStores;
+using LisaScheers.EventFlowAddons.CosmosDB.SnapshotStores;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EventFlowAddons.CosmosDB.Extensions;
-
-public static class EventFlowOptionsSnapshotExtensions
+namespace LisaScheers.EventFlowAddons.CosmosDB.Extensions
 {
-    public static IEventFlowOptions UseCosmosDbSnapshotStore(
-        this IEventFlowOptions eventFlowOptions)
+
+    public static class EventFlowOptionsSnapshotExtensions
     {
-        return eventFlowOptions
-            .UseSnapshotPersistence<CosmosDbSnapshotPersistence>(ServiceLifetime.Transient);
+        public static IEventFlowOptions UseCosmosDbSnapshotStore(
+            this IEventFlowOptions eventFlowOptions)
+        {
+            return eventFlowOptions
+                .UseSnapshotPersistence<CosmosDbSnapshotPersistence>(ServiceLifetime.Transient);
+        }
     }
 }

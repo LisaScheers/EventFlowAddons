@@ -1,20 +1,24 @@
-﻿using EventFlow.ValueObjects;
+﻿using System;
+using System.Collections.Generic;
+using EventFlow.ValueObjects;
 
-namespace EventFlowAddons.CosmosDB.ValueObjects;
-
-public class ReadModelDescription : ValueObject
+namespace LisaScheers.EventFlowAddons.CosmosDB.ValueObjects
 {
-    public ReadModelDescription(RootContainerName rootContainerName)
+
+    public class ReadModelDescription : ValueObject
     {
-        if (rootContainerName == null) throw new ArgumentNullException(nameof(rootContainerName));
+        public ReadModelDescription(RootContainerName rootContainerName)
+        {
+            if (rootContainerName == null) throw new ArgumentNullException(nameof(rootContainerName));
 
-        RootContainerName = rootContainerName;
-    }
+            RootContainerName = rootContainerName;
+        }
 
-    public RootContainerName RootContainerName { get; }
+        public RootContainerName RootContainerName { get; }
 
-    protected override IEnumerable<object> GetEqualityComponents()
-    {
-        yield return RootContainerName;
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return RootContainerName;
+        }
     }
 }

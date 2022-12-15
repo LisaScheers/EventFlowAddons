@@ -1,25 +1,30 @@
-using EventFlow.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using EventFlow.Queries;
-using EventFlowAddons.CosmosDB.ReadStore;
-using EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
+using LisaScheers.EventFlowAddons.CosmosDB.ReadStore;
+using LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.Queries;
+using LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.ReadModels;
 
-namespace EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers;
-
-public class
-    CosmosDbThingyGetWithLinqQueryHandler : IQueryHandler<CosmosDbThingyGetWithLinqQuery,
-        IOrderedQueryable<CosmosDbThingyReadModel>>
+namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores.QueryHandlers
 {
-    private readonly ICosmosDbReadModelStore<CosmosDbThingyReadModel> _readStore;
 
-    public CosmosDbThingyGetWithLinqQueryHandler(
-        ICosmosDbReadModelStore<CosmosDbThingyReadModel> mongeReadStore)
+    public class
+        CosmosDbThingyGetWithLinqQueryHandler : IQueryHandler<CosmosDbThingyGetWithLinqQuery,
+            IOrderedQueryable<CosmosDbThingyReadModel>>
     {
-        _readStore = mongeReadStore;
-    }
+        private readonly ICosmosDbReadModelStore<CosmosDbThingyReadModel> _readStore;
 
-    public Task<IOrderedQueryable<CosmosDbThingyReadModel>> ExecuteQueryAsync(CosmosDbThingyGetWithLinqQuery query,
-        CancellationToken cancellationToken)
-    {
-        return Task.FromResult(_readStore.GetItemLinqQueryable());
+        public CosmosDbThingyGetWithLinqQueryHandler(
+            ICosmosDbReadModelStore<CosmosDbThingyReadModel> mongeReadStore)
+        {
+            _readStore = mongeReadStore;
+        }
+
+        public Task<IOrderedQueryable<CosmosDbThingyReadModel>> ExecuteQueryAsync(CosmosDbThingyGetWithLinqQuery query,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_readStore.GetItemLinqQueryable());
+        }
     }
 }
