@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using EventFlow.Aggregates;
@@ -17,8 +18,10 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores
         IAmReadModelFor<ThingyAggregate, ThingyId, ThingyMessageAddedEvent>,
         IAmReadModelFor<ThingyAggregate, ThingyId, ThingyMessageHistoryAddedEvent>
     {
+        [JsonPropertyName("thingyId")]
         public string ThingyId { get; set; }
 
+        [JsonPropertyName("message")]
         public string Message { get; set; }
 
         public Task ApplyAsync(IReadModelContext context,

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+        <AssemblyName>LisaScheers.EventFlowAddons.Elastic</AssemblyName>
+        <RootNamespace>LisaScheers.EventFlowAddons.Elastic</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.4" />
+      <PackageReference Include="EventFlow" Version="1.0.5002-alpha" />
+    </ItemGroup>
+
+</Project>
