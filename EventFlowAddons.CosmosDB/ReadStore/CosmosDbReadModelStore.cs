@@ -16,7 +16,6 @@ using Microsoft.Extensions.Logging;
 
 namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore
 {
-
     public class CosmosDbReadModelStore<TReadModel> : ICosmosDbReadModelStore<TReadModel>
         where TReadModel : class, ICosmosDbReadModel
     {
@@ -96,10 +95,6 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore
             Func<IReadModelContext, IReadOnlyCollection<IDomainEvent>, ReadModelEnvelope<TReadModel>, CancellationToken,
                 Task<ReadModelUpdateResult<TReadModel>>> updateReadModel, CancellationToken cancellationToken)
         {
-            // TODO: Optimize this to use bulk operations instead of one by one
-            // create container if not exists
-
-
             var readModelDescription = _readModelDescriptionProvider.GetReadModelDescription<TReadModel>();
             _logger.LogInformation(
                 "Updating '{ReadModelType}' with id '{Id}', from '{@RootCollectionName}'!",
@@ -162,13 +157,11 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore
                 response = await container.ReadItemAsync<TReadModel>(readModelUpdate.ReadModelId,
                     new PartitionKey(readModelUpdate.ReadModelId), cancellationToken: cancellationToken);
             }
-            catch (Exception e)
+            catch (Exception e) when (e is CosmosException {StatusCode: HttpStatusCode.NotFound})
             {
-                if (e is CosmosException cosmosException && cosmosException.StatusCode == HttpStatusCode.NotFound)
-                    response = null;
-                else
-                    throw;
+                response = null;
             }
+
 
             var isAvailable = response != null;
             var readModelEnvelope = isAvailable
@@ -191,7 +184,6 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore
             }
 
             readModelEnvelope = readModelUpdateResult.Envelope;
-            var originalVersion = readModelEnvelope.Version;
             readModelEnvelope.ReadModel.Version = readModelEnvelope.Version;
             try
             {
@@ -213,7 +205,5 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.ReadStore
                 );
             }
         }
-
-
     }
 }

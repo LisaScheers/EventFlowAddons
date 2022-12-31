@@ -17,7 +17,7 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores
         IAmReadModelFor<ThingyAggregate, ThingyId, ThingyDeletedEvent>
     {
         public bool DomainErrorAfterFirstReceived { get; set; }
-
+        
         public int PingsReceived { get; set; }
 
         public Task ApplyAsync(IReadModelContext context,

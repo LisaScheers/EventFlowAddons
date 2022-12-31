@@ -26,6 +26,7 @@ namespace LisaScheers.EventFlowAddons.CosmosDB.Tests.IntegrationTests.ReadStores
         public async Task<IReadOnlyCollection<ThingyMessage>> ExecuteQueryAsync(ThingyGetMessagesQuery query,
             CancellationToken cancellationToken)
         {
+         
             var thingyId = query.ThingyId.ToString();
             var messages = _readStore.GetItemLinqQueryable().Where(x => x.ThingyId == thingyId).ToList()
                 .Select(x => x.ToThingyMessage())
